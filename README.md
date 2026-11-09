@@ -152,7 +152,7 @@ flowchart LR
 A MLP supera o baseline em **8,4 p.p.** de acurácia.
 
 <p align="center">
-  <img src="reports/figs/curvas.png" width="620" alt="Curvas de perda e acurácia">
+  <img src="figs/curvas.png" width="620" alt="Curvas de perda e acurácia">
   <img src="reports/figs/matriz_confusao.png" width="250" alt="Matriz de confusão no teste">
 </p>
 
