@@ -32,11 +32,12 @@
 5. [Modelagem](#-modelagem)
 6. [Resultados](#-resultados)
 7. [Aplicação web](#-aplicação-web)
-8. [Estrutura do repositório](#-estrutura-do-repositório)
-9. [Como reproduzir](#-como-reproduzir)
-10. [Decisões técnicas](#-decisões-técnicas)
-11. [Limitações e uso responsável](#-limitações-e-uso-responsável)
-12. [Equipe, IA generativa e licença](#-equipe)
+8. [Relatório técnico em imagens](#-relatório-técnico-em-imagens)
+9. [Estrutura do repositório](#-estrutura-do-repositório)
+10. [Como reproduzir](#-como-reproduzir)
+11. [Decisões técnicas](#-decisões-técnicas)
+12. [Limitações e uso responsável](#-limitações-e-uso-responsável)
+13. [Equipe, IA generativa e licença](#-equipe)
 
 ## 🎯 Visão geral
 A segurança pública é um desafio relevante para São Paulo, e os dados públicos de ocorrências permitem demonstrar uma aplicação prática de IA em dados tabulares.
@@ -79,6 +80,13 @@ período do dia e se o boletim informa a hora exata** — e devolve as probabili
 
 > **Hora ausente (41,1% dos BOs).** Nesses casos a base informa o período em `DESCR_PERIODO`. Descartar essas linhas removeria dezenas de milhares de registros e **enviesaria a amostra**:
 > só ~20% dos BOs sem hora exata são roubo, contra ~51% nos que têm hora. Por isso o período vem da hora **ou** de `DESCR_PERIODO`, e criamos o atributo `hora_informada`.
+
+### Exploração dos dados
+<p align="center"><img src="reports/figs/exploracao.png" width="900" alt="Distribuição das classes e proporção de roubo por tipo de local, período e hora exata"></p>
+
+- **Classes desbalanceadas:** furto é a maioria — por isso a acurácia é comparada com o *baseline* e usamos precision/recall/F1 da classe *roubo*.
+- **O tipo de local e o período carregam sinal:** a proporção de roubo varia bastante entre tipos de local e é maior na madrugada e à noite.
+- **Boletins sem hora exata** têm proporção de roubo bem menor, o que justifica o atributo `hora_informada` e o cuidado de não descartar essas linhas.
 
 > Os dados brutos **não** estão neste repositório (72 MB, propriedade da SSP-SP). Veja [Como reproduzir](#-como-reproduzir).
 
@@ -167,6 +175,13 @@ O formulário usa **exatamente** os atributos do treino e mostra a classe estima
 | **Página autônoma** | **https://claude.ai/artifact/8WTRgG4cbjwM8Awmh2txn4** | A MLP roda **no navegador** (pesos embutidos em `app/app_estatica.html`). Validada contra o scikit-learn: diferença máxima de **2e-16**. |
 | **Flask** | `python app/app.py` → <http://127.0.0.1:5000> | Servidor com API JSON; pronto para deploy (`render.yaml`, `Procfile`). |
 
+<p align="center">
+  <img src="reports/figs/app_resultado_furto.png" width="310" alt="Exemplo de classificação: furto">
+  &nbsp;&nbsp;
+  <img src="reports/figs/app_resultado_roubo.png" width="310" alt="Exemplo de classificação: roubo">
+</p>
+<p align="center"><sub>Dois exemplos na interface: ocorrência mais compatível com <b>furto</b> (esquerda) e com <b>roubo</b> (direita). As probabilidades descrevem o <i>tipo</i> da ocorrência, não o risco de um crime.</sub></p>
+
 ### API (Flask)
 | Método | Rota | Descrição |
 |---|---|---|
@@ -183,7 +198,23 @@ curl -X POST http://127.0.0.1:5000/api/predict -H "Content-Type: application/jso
 ```
 Valores fora da lista (bairros raros, por exemplo) são mapeados para a categoria “infrequente” aprendida no treino. Entradas inválidas retornam `400` com a mensagem de erro.
 
-## 🗂️ Estrutura do repositório
+## 📸 Relatório técnico em imagens
+Versão completa em [`docs/relatorio_tecnico.pdf`](docs/relatorio_tecnico.pdf) (10 slides). Clique em uma miniatura para ampliar.
+
+<details>
+<summary><b>Ver os 10 slides</b></summary>
+
+<table>
+<tr><td align="center"><a href="docs/img/slide-01.png"><img src="docs/img/slide-01.png" width="300" alt="Slide 1: Capa"></a><br><sub>1. Capa</sub></td><td align="center"><a href="docs/img/slide-02.png"><img src="docs/img/slide-02.png" width="300" alt="Slide 2: Problema, fonte e recorte"></a><br><sub>2. Problema, fonte e recorte</sub></td></tr>
+<tr><td align="center"><a href="docs/img/slide-03.png"><img src="docs/img/slide-03.png" width="300" alt="Slide 3: Preparação dos dados"></a><br><sub>3. Preparação dos dados</sub></td><td align="center"><a href="docs/img/slide-04.png"><img src="docs/img/slide-04.png" width="300" alt="Slide 4: Arquitetura da MLP"></a><br><sub>4. Arquitetura da MLP</sub></td></tr>
+<tr><td align="center"><a href="docs/img/slide-05.png"><img src="docs/img/slide-05.png" width="300" alt="Slide 5: Configuração do treinamento"></a><br><sub>5. Configuração do treinamento</sub></td><td align="center"><a href="docs/img/slide-06.png"><img src="docs/img/slide-06.png" width="300" alt="Slide 6: Arquiteturas testadas"></a><br><sub>6. Arquiteturas testadas</sub></td></tr>
+<tr><td align="center"><a href="docs/img/slide-07.png"><img src="docs/img/slide-07.png" width="300" alt="Slide 7: Comparação e escolha"></a><br><sub>7. Comparação e escolha</sub></td><td align="center"><a href="docs/img/slide-08.png"><img src="docs/img/slide-08.png" width="300" alt="Slide 8: Curvas e matriz de confusão"></a><br><sub>8. Curvas e matriz de confusão</sub></td></tr>
+<tr><td align="center"><a href="docs/img/slide-09.png"><img src="docs/img/slide-09.png" width="300" alt="Slide 9: Aplicação web"></a><br><sub>9. Aplicação web</sub></td><td align="center"><a href="docs/img/slide-10.png"><img src="docs/img/slide-10.png" width="300" alt="Slide 10: Conclusões"></a><br><sub>10. Conclusões</sub></td></tr>
+</table>
+
+</details>
+
+## 📁 Estrutura do repositório
 ```text
 .
 ├── README.md
@@ -192,7 +223,8 @@ Valores fora da lista (bairros raros, por exemplo) são mapeados para a categori
 ├── notebooks/
 │   └── mlp_ocorrencias_sp.ipynb      # análise completa, já executada (GitHub renderiza)
 ├── docs/
-│   └── relatorio_tecnico.pdf|pptx    # relatório técnico de 10 slides
+│   ├── relatorio_tecnico.pdf|pptx    # relatório técnico de 10 slides
+│   └── img/                          # slides em PNG (usados no README)
 ├── src/
 │   ├── data_prep.py                  # leitura, recorte, rótulo, duplicidades, atributos
 │   ├── mlp_lib.py                    # pré-processamento, treino, métricas, gráficos, seleção
@@ -251,7 +283,7 @@ python app/app.py                    # http://127.0.0.1:5000
 | Métricas da classe *roubo* + baseline | Com classes desbalanceadas, a acurácia sozinha engana. |
 | Semente fixa (42) | Resultados reproduzíveis. |
 
-## ⚖️ Limitações e uso responsável
+## 🚧 Limitações e uso responsável
 - **Subnotificação e vieses:** os boletins refletem apenas o que foi registrado, e a rubrica depende da classificação policial. Pode haver vieses geográficos e sociais.
 - **Escopo temporal:** apenas ocorrências com boletim registrado em 2026; não foi feita validação temporal.
 - **Informação limitada:** local, bairro, dia e período explicam parte da natureza do crime; o desempenho é moderado e não deve ser tratado como determinístico.
