@@ -199,7 +199,7 @@ curl -X POST http://127.0.0.1:5000/api/predict -H "Content-Type: application/jso
 Valores fora da lista (bairros raros, por exemplo) são mapeados para a categoria “infrequente” aprendida no treino. Entradas inválidas retornam `400` com a mensagem de erro.
 
 ## 📸 Relatório técnico em imagens
-Versão completa em [`docs/relatorio_tecnico.pdf`](docs/relatorio_tecnico.pdf) (10 slides). Clique em uma miniatura para ampliar.
+Versão completa em [`mlp-roubo-furto-sp/docs/relatorio_tecnico.pdf`](docs/relatorio_tecnico.pdf) (10 slides). Clique em uma miniatura para ampliar.
 
 <details>
 <summary><b>Ver os 10 slides</b></summary>
