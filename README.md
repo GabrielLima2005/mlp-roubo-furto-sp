@@ -172,7 +172,7 @@ O formulário usa **exatamente** os atributos do treino e mostra a classe estima
 
 | Versão | Como acessar | Observação |
 |---|---|---|
-| **Página autônoma** | **https://claude.ai/artifact/8WTRgG4cbjwM8Awmh2txn4** | A MLP roda **no navegador** (pesos embutidos em `app/app_estatica.html`). Validada contra o scikit-learn: diferença máxima de **2e-16**. |
+| **Página autônoma** | **file:///C:/Users/silva/Downloads/Roubo%20ou%20furto_%20MLP%20%C2%B7%20S%C3%A3o%20Paulo.html** | A MLP roda **no navegador** (pesos embutidos em `app/app_estatica.html`). Validada contra o scikit-learn: diferença máxima de **2e-16**. |
 | **Flask** | `python app/app.py` → <http://127.0.0.1:5000> | Servidor com API JSON; pronto para deploy (`render.yaml`, `Procfile`). |
 
 <p align="center">
