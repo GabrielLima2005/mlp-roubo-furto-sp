@@ -12,7 +12,7 @@
 
 **Global Solution · Aprendizado Profundo com Redes Neurais Convolucionais · FIAP**
 
-[🌐 Aplicação web](file:///C:/Users/silva/Downloads/Roubo%20ou%20furto_%20MLP%20%C2%B7%20S%C3%A3o%20Paulo.html) · [📓 Notebook] · [📑 Relatório (PDF)] · [🧠 Modelo]
+[🌐 Aplicação web](file:///C:/Users/silva/Downloads/Roubo%20ou%20furto_%20MLP%20%C2%B7%20S%C3%A3o%20Paulo.html) 📓 Notebook  📑 Relatório (PDF) 🧠 Modelo
 
 <img src="mlp-roubo-furto-sp/reports/figs/app_screenshot.png" width="380" alt="Interface da aplicação web">
 
