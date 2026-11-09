@@ -14,7 +14,7 @@
 
 [🌐 Aplicação web](https://claude.ai/artifact/8WTRgG4cbjwM8Awmh2txn4) · [📓 Notebook](notebooks/mlp_ocorrencias_sp.ipynb) · [📑 Relatório (PDF)](docs/relatorio_tecnico.pdf) · [🧠 Modelo](models/)
 
-<img src="reports/figs/app_screenshot.png" width="380" alt="Interface da aplicação web">
+<img src="mlp-roubo-furto-sp/reports/figs/app_screenshot.png" width="380" alt="Interface da aplicação web">
 
 </div>
 
