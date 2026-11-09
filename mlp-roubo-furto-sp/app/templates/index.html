@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roubo ou furto? — MLP · São Paulo</title>
+<style>
+  :root{--bg:#f5f6f8;--card:#fff;--ink:#1d2433;--mut:#5f6b7f;--acc:#1f4e9c;--rou:#c2410c;--fur:#0f766e;--bd:#e2e6ee}
+  @media (prefers-color-scheme:dark){:root{--bg:#0f1420;--card:#171e2e;--ink:#e8ecf4;--mut:#9aa6bd;--acc:#6ea0ff;--rou:#fb923c;--fur:#2dd4bf;--bd:#2a3550}}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
+  main{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+  h1{font-size:1.5rem;margin:.2rem 0} p.sub{color:var(--mut);margin-top:0}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-top:16px}
+  label{display:block;font-weight:600;margin:12px 0 4px;font-size:.92rem}
+  select,input[type=number]{width:100%;padding:10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font-size:1rem}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:560px){.row{grid-template-columns:1fr}}
+  button{margin-top:18px;width:100%;padding:12px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:1rem;font-weight:700;cursor:pointer}
+  .bar{height:28px;border-radius:8px;background:var(--bd);overflow:hidden;margin:6px 0 14px}
+  .bar>div{height:100%;display:flex;align-items:center;padding-left:10px;color:#fff;font-weight:700;font-size:.9rem;white-space:nowrap;transition:width .4s}
+  .res h2{margin:0 0 4px} .note{font-size:.85rem;color:var(--mut)}
+  .warn{border-left:4px solid var(--rou);padding:8px 12px;background:var(--card);border-radius:6px;font-size:.88rem;color:var(--mut);margin-top:16px}
+  .demo{background:#fde68a;color:#78350f;padding:8px 12px;border-radius:8px;font-weight:600;font-size:.88rem}
+  .hidden{display:none}
+</style>
+</head>
+<body><main>
+<h1>Roubo ou furto?</h1>
+<p class="sub">MLP treinada com registros da cidade de São Paulo (SSP-SP). Modelo: <b>{{ modelo }}</b></p>
+{% if synthetic %}<p class="demo">⚠ Modelo treinado com dados SINTÉTICOS de demonstração — resultados sem valor real.</p>{% endif %}
+
+<div class="card">
+  <form id="f">
+    <label for="bairro">Bairro</label>
+    <select id="bairro" name="bairro">{% for b in opts.bairro %}<option>{{ b }}</option>{% endfor %}<option>{{ outro }}</option></select>
+    <label for="tipo_local">Tipo de local</label>
+    <select id="tipo_local" name="tipo_local">{% for t in opts.tipo_local %}<option>{{ t }}</option>{% endfor %}<option>{{ outro }}</option></select>
+    <div class="row">
+      <div><label for="dia_semana">Dia da semana</label>
+        <select id="dia_semana" name="dia_semana">{% for d in dias %}<option>{{ d }}</option>{% endfor %}</select></div>
+      <div><label for="periodo">Período do dia</label>
+        <select id="periodo" name="periodo">{% for p in periodos %}<option>{{ p }}</option>{% endfor %}</select></div>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:500"><input type="checkbox" id="hora_informada" name="hora_informada" checked>
+      O boletim informa a hora exata do fato</label>
+    <p class="note">Desmarque se o registro traz apenas o período (comum em ocorrências percebidas depois).</p>
+    <button type="submit">Classificar ocorrência</button>
+  </form>
+</div>
+
+<div class="card res hidden" id="res">
+  <h2 id="classe"></h2>
+  <p class="note">Probabilidades atribuídas pelo modelo à <b>ocorrência descrita</b>:</p>
+  <div>Roubo</div><div class="bar"><div id="br" style="background:var(--rou)"></div></div>
+  <div>Furto</div><div class="bar"><div id="bf" style="background:var(--fur)"></div></div>
+</div>
+
+<div class="warn"><b>Como interpretar:</b> o modelo classifica o <i>tipo</i> de uma ocorrência já registrada (ou hipotética)
+com essas características. Ele <b>não</b> estima o risco nem a chance de um crime acontecer em determinado local ou horário.</div>
+</main>
+<script>
+document.getElementById('f').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const body=Object.fromEntries(new FormData(e.target)); body.hora_informada=document.getElementById('hora_informada').checked?1:0;
+  const r=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json(); if(!r.ok){alert(d.erro);return;}
+  const pr=(d.prob_roubo*100).toFixed(1), pf=(d.prob_furto*100).toFixed(1);
+  document.getElementById('res').classList.remove('hidden');
+  document.getElementById('classe').textContent="Mais compatível com: "+d.classe.toUpperCase();
+  const br=document.getElementById('br'), bf=document.getElementById('bf');
+  br.style.width=pr+"%"; br.textContent=pr+"%"; bf.style.width=pf+"%"; bf.textContent=pf+"%";
+});
+</script>
+</body></html>

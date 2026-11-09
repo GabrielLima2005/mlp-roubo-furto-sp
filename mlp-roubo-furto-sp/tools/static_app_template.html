@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roubo ou furto? MLP · São Paulo</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#1d2433;--mut:#5f6b7f;--acc:#1f4e9c;--rou:#c2410c;--fur:#0f766e;--bd:#e2e6ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1420;--card:#171e2e;--ink:#e8ecf4;--mut:#9aa6bd;--acc:#6ea0ff;--rou:#fb923c;--fur:#2dd4bf;--bd:#2a3550}}
+:root[data-theme="dark"]{--bg:#0f1420;--card:#171e2e;--ink:#e8ecf4;--mut:#9aa6bd;--acc:#6ea0ff;--rou:#fb923c;--fur:#2dd4bf;--bd:#2a3550}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 16px 48px}h1{font-size:1.5rem;margin:.2rem 0}.sub{color:var(--mut);margin-top:0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-top:16px}
+label{display:block;font-weight:600;margin:12px 0 4px;font-size:.92rem}
+select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font-size:1rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:560px){.row{grid-template-columns:1fr}}
+.chk{display:flex;gap:8px;align-items:center;font-weight:500}.note{font-size:.85rem;color:var(--mut)}
+button{margin-top:18px;width:100%;padding:12px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:1rem;font-weight:700;cursor:pointer}
+.bar{height:28px;border-radius:8px;background:var(--bd);overflow:hidden;margin:6px 0 14px}
+.bar>div{height:100%;display:flex;align-items:center;padding-left:10px;color:#fff;font-weight:700;font-size:.9rem;white-space:nowrap;transition:width .4s}
+.warn{border-left:4px solid var(--rou);padding:8px 12px;background:var(--card);border-radius:6px;font-size:.88rem;color:var(--mut);margin-top:16px}
+.demo{background:#fde68a;color:#78350f;padding:8px 12px;border-radius:8px;font-weight:600;font-size:.88rem}.hidden{display:none}
+</style></head><body><main>
+<h1>Roubo ou furto?</h1>
+<p class="sub">MLP treinada com boletins de celulares subtraídos na cidade de São Paulo (SSP-SP, 2026). Modelo: <b id="nome"></b></p>
+<p class="demo hidden" id="demo">⚠ Modelo treinado com dados sintéticos de demonstração.</p>
+<div class="card"><form id="f">
+<label for="bairro">Bairro</label><select id="bairro"></select>
+<label for="tipo_local">Tipo de local</label><select id="tipo_local"></select>
+<div class="row"><div><label for="dia_semana">Dia da semana</label><select id="dia_semana"></select></div>
+<div><label for="periodo">Período do dia</label><select id="periodo"></select></div></div>
+<label class="chk"><input type="checkbox" id="hora_informada" checked> O boletim informa a hora exata do fato</label>
+<p class="note">Desmarque se o registro traz apenas o período (comum em ocorrências percebidas depois).</p>
+<button type="submit">Classificar ocorrência</button></form></div>
+<div class="card hidden" id="res"><h2 id="classe" style="margin:0 0 4px"></h2>
+<p class="note">Probabilidades atribuídas pelo modelo à ocorrência descrita:</p>
+<div>Roubo</div><div class="bar"><div id="br" style="background:var(--rou)"></div></div>
+<div>Furto</div><div class="bar"><div id="bf" style="background:var(--fur)"></div></div></div>
+<div class="warn"><b>Como interpretar:</b> o modelo classifica o <i>tipo</i> de uma ocorrência já registrada (ou hipotética) com essas características.
+Ele <b>não</b> estima o risco nem a chance de um crime acontecer em determinado local ou horário.</div>
+</main>
+<script>
+const M=__MODEL__, DIAS=__DIAS__, PERIODOS=__PERIODOS__, OUTRO="OUTRO / NÃO LISTADO";
+const ORDER=["bairro","tipo_local","dia_semana","periodo"];
+const fill=(id,opts)=>{document.getElementById(id).innerHTML=opts.map(o=>`<option>${o}</option>`).join("")};
+fill("bairro",[...M.cats.bairro.freq,OUTRO]); fill("tipo_local",[...M.cats.tipo_local.freq,OUTRO]);
+fill("dia_semana",DIAS); fill("periodo",PERIODOS);
+document.getElementById("nome").textContent=M.nome;
+if(M.synthetic) document.getElementById("demo").classList.remove("hidden");
+// Mesma codificação do scikit-learn: one-hot das categorias frequentes + 1 coluna "infrequente" (se houver) por atributo; depois a binária.
+function encode(v){
+  const x=[];
+  for(const c of ORDER){
+    const {freq,infreq}=M.cats[c], i=freq.indexOf(v[c]);
+    const row=new Array(freq.length+infreq).fill(0);
+    if(i>=0) row[i]=1; else if(infreq) row[freq.length]=1;
+    x.push(...row);
+  }
+  x.push(v.hora_informada); return x;
+}
+const act=z=>M.act==="tanh"?Math.tanh(z):Math.max(0,z);
+function predict(v){
+  const x=encode(v), H=M.b1.length, h=new Array(H);
+  for(let j=0;j<H;j++){let s=M.b1[j];for(let i=0;i<x.length;i++) if(x[i]) s+=x[i]*M.W1[i][j];h[j]=act(s)}
+  let z=M.b2; for(let j=0;j<H;j++) z+=h[j]*M.W2[j];
+  return 1/(1+Math.exp(-z));
+}
+window.predict=predict;
+document.getElementById("f").addEventListener("submit",e=>{
+  e.preventDefault();
+  const g=id=>document.getElementById(id).value;
+  const p=predict({bairro:g("bairro"),tipo_local:g("tipo_local"),dia_semana:g("dia_semana"),periodo:g("periodo"),
+                   hora_informada:document.getElementById("hora_informada").checked?1:0});
+  const pr=(p*100).toFixed(1), pf=((1-p)*100).toFixed(1);
+  document.getElementById("res").classList.remove("hidden");
+  document.getElementById("classe").textContent="Mais compatível com: "+(p>=.5?"ROUBO":"FURTO");
+  const br=document.getElementById("br"), bf=document.getElementById("bf");
+  br.style.width=pr+"%"; br.textContent=pr+"%"; bf.style.width=pf+"%"; bf.textContent=pf+"%";
+});
+</script></body></html>

@@ -1,0 +1,6 @@
+*.ipynb linguist-documentation
+*.html linguist-documentation
+*.joblib binary
+*.pptx binary
+*.pdf binary
+*.png binary
