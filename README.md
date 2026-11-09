@@ -82,7 +82,7 @@ período do dia e se o boletim informa a hora exata** — e devolve as probabili
 > só ~20% dos BOs sem hora exata são roubo, contra ~51% nos que têm hora. Por isso o período vem da hora **ou** de `DESCR_PERIODO`, e criamos o atributo `hora_informada`.
 
 ### Exploração dos dados
-<p align="center"><img src="reports/figs/exploracao.png" width="900" alt="Distribuição das classes e proporção de roubo por tipo de local, período e hora exata"></p>
+<p align="center"><img src="mlp-roubo-furto-sp/reports/figs/exploracao.png" width="900" alt="Distribuição das classes e proporção de roubo por tipo de local, período e hora exata"></p>
 
 - **Classes desbalanceadas:** furto é a maioria — por isso a acurácia é comparada com o *baseline* e usamos precision/recall/F1 da classe *roubo*.
 - **O tipo de local e o período carregam sinal:** a proporção de roubo varia bastante entre tipos de local e é maior na madrugada e à noite.
@@ -142,7 +142,7 @@ flowchart LR
 | D_profunda_L2 (128-64-32) | 26.784 | 7/15 | 73,5% | 73,0% | 37,7% | **49,7%** |  |
 | E_tanh (64-32) | 10.336 | 17/25 | 73,4% | 68,5% | 43,7% | **53,3%** |  |
 
-<p align="center"><img src="reports/figs/comparacao.png" width="640" alt="Comparação das arquiteturas"></p>
+<p align="center"><img src="mlp-roubo-furto-sp/reports/figs/comparacao.png" width="640" alt="Comparação das arquiteturas"></p>
 
 ### Teste final — modelo selecionado (`A_simples (16)`)
 | Acurácia | Precision | Recall | F1 | Baseline “sempre furto” |
@@ -152,8 +152,8 @@ flowchart LR
 A MLP supera o baseline em **8,4 p.p.** de acurácia.
 
 <p align="center">
-  <img src="reports/figs/curvas.png" width="620" alt="Curvas de perda e acurácia">
-  <img src="reports/figs/matriz_confusao.png" width="250" alt="Matriz de confusão no teste">
+  <img src="mlp-roubo-furto-sp/reports/figs/curvas.png" width="620" alt="Curvas de perda e acurácia">
+  <img src="mlp-roubo-furto-sp/reports/figs/matriz_confusao.png" width="250" alt="Matriz de confusão no teste">
 </p>
 
 | Matriz de confusão (teste) | Previsto: furto | Previsto: roubo |
@@ -176,9 +176,9 @@ O formulário usa **exatamente** os atributos do treino e mostra a classe estima
 | **Flask** | `python app/app.py` → <http://127.0.0.1:5000> | Servidor com API JSON; pronto para deploy (`render.yaml`, `Procfile`). |
 
 <p align="center">
-  <img src="reports/figs/app_resultado_furto.png" width="310" alt="Exemplo de classificação: furto">
+  <img src="mlp-roubo-furto-sp/reports/figs/app_resultado_furto.png" width="310" alt="Exemplo de classificação: furto">
   &nbsp;&nbsp;
-  <img src="reports/figs/app_resultado_roubo.png" width="310" alt="Exemplo de classificação: roubo">
+  <img src="mlp-roubo-furto-sp/reports/figs/app_resultado_roubo.png" width="310" alt="Exemplo de classificação: roubo">
 </p>
 <p align="center"><sub>Dois exemplos na interface: ocorrência mais compatível com <b>furto</b> (esquerda) e com <b>roubo</b> (direita). As probabilidades descrevem o <i>tipo</i> da ocorrência, não o risco de um crime.</sub></p>
 
